@@ -21,20 +21,24 @@ import me.shedaniel.clothconfig2.api.ConfigEntryBuilder;
 public final class FogControlConfig {
     private static FogControlConfig INSTANCE = null;
 
-    private static final int MIN_DISTANCE_NETHER = 0;
-    private static final int DEFAULT_DISTANCE_NETHER = 192;
-    private static final int MAX_DISTANCE_NETHER = 512;
+    private static final int MIN_NETHER_DISTANCE = 0;
+    private static final int MAX_NETHER_DISTANCE = 512;
+    private static final int DEFAULT_NETHER_DISTANCE = 192;
 
     private static final int MIN_MULTIPLIER = 0;
-    private static final int DEFAULT_MULTIPLIER_NETHER = 50;
-    private static final int DEFAULT_MULTIPLIER_OVERWORLD = 75;
-    private static final int MAX_MULTIPLIER = 200;
+    private static final int MAX_MULTIPLIER = 125;
     private static final int MULTIPLIER_DIVIDER = 100;
+    private static final int DEFAULT_NETHER_START_MULTIPLIER = 5;
+    private static final int DEFAULT_NETHER_END_MULTIPLIER = 50;
+    private static final int DEFAULT_OVERWORLD_START_MULTIPLIER = 75;
+    private static final int DEFAULT_OVERWORLD_END_MULTIPLIER = 100;
 
-    private class Data {
-        Integer netherFogMaxDistance = DEFAULT_DISTANCE_NETHER;
-        Integer netherFogMultiplier = DEFAULT_MULTIPLIER_NETHER;
-        Integer overworldFogMultiplier = DEFAULT_MULTIPLIER_OVERWORLD;
+    private static class Data {
+        Integer netherFogMaxDistance = DEFAULT_NETHER_DISTANCE;
+        Integer netherFogStartMultiplier = DEFAULT_NETHER_START_MULTIPLIER;
+        Integer netherFogEndMultiplier = DEFAULT_NETHER_END_MULTIPLIER;
+        Integer overworldFogStartMultiplier = DEFAULT_OVERWORLD_START_MULTIPLIER;
+        Integer overworldFogEndMultiplier = DEFAULT_OVERWORLD_END_MULTIPLIER;
     }
 
     private Data data = new Data();
@@ -57,12 +61,20 @@ public final class FogControlConfig {
         return (float) data.netherFogMaxDistance;
     }
 
-    public Float getNetherFogMultiplier() {
-        return ((float) data.netherFogMultiplier) / MULTIPLIER_DIVIDER;
+    public Float getNetherFogStartMultiplier() {
+        return ((float) data.netherFogStartMultiplier) / MULTIPLIER_DIVIDER;
     }
 
-    public Float getOverworldFogMultiplier() {
-        return ((float) data.overworldFogMultiplier) / MULTIPLIER_DIVIDER;
+    public Float getNetherFogEndMultiplier() {
+        return ((float) data.netherFogEndMultiplier) / MULTIPLIER_DIVIDER;
+    }
+
+    public Float getOverworldFogStartMultiplier() {
+        return ((float) data.overworldFogStartMultiplier) / MULTIPLIER_DIVIDER;
+    }
+
+    public Float getOverworldFogEndMultiplier() {
+        return ((float) data.overworldFogEndMultiplier) / MULTIPLIER_DIVIDER;
     }
 
     public Screen buildScreen(Screen parent) {
@@ -70,37 +82,43 @@ public final class FogControlConfig {
             .setParentScreen(parent)
             .setTitle(new TranslatableText("Fog Control Mod"));
 
-        builder.setSavingRunnable(() -> {
-            saveConfig();
-        });
+        builder.setSavingRunnable(this::saveConfig);
 
         ConfigEntryBuilder entryBuilder = builder.entryBuilder();
         ConfigCategory general = builder.getOrCreateCategory(new TranslatableText("Fog Controls"));
 
-        general.addEntry(entryBuilder.startIntSlider(new TranslatableText("Nether Fog Max Distance"), data.netherFogMaxDistance, MIN_DISTANCE_NETHER, MAX_DISTANCE_NETHER)
-            .setDefaultValue(DEFAULT_DISTANCE_NETHER)
+        general.addEntry(entryBuilder.startIntSlider(new TranslatableText("Nether Fog Max Distance"), data.netherFogMaxDistance, MIN_NETHER_DISTANCE, MAX_NETHER_DISTANCE)
+            .setDefaultValue(DEFAULT_NETHER_DISTANCE)
             .setTooltip(new TranslatableText("Nether Fog Max Distance"))
-            .setSaveConsumer(newDistance -> {
-                data.netherFogMaxDistance = newDistance;
-            })
+            .setSaveConsumer(newDistance -> data.netherFogMaxDistance = newDistance)
             .build()
         );
 
-        general.addEntry(entryBuilder.startIntSlider(new TranslatableText("Nether Fog Multiplier"), data.netherFogMultiplier, MIN_MULTIPLIER, MAX_MULTIPLIER)
-            .setDefaultValue(DEFAULT_MULTIPLIER_NETHER)
+        general.addEntry(entryBuilder.startIntSlider(new TranslatableText("Nether Fog Start Multiplier"), data.netherFogStartMultiplier, MIN_MULTIPLIER, MAX_MULTIPLIER)
+            .setDefaultValue(DEFAULT_NETHER_START_MULTIPLIER)
             .setTooltip(new TranslatableText("Nether Fog Multiplier"))
-            .setSaveConsumer(newMultiplier -> {
-                data.netherFogMultiplier = newMultiplier;
-            })
+            .setSaveConsumer(newMultiplier -> data.netherFogStartMultiplier = newMultiplier)
             .build()
         );
 
-        general.addEntry(entryBuilder.startIntSlider(new TranslatableText("Overworld Fog Multiplier"), data.overworldFogMultiplier, MIN_MULTIPLIER, MAX_MULTIPLIER)
-            .setDefaultValue(DEFAULT_MULTIPLIER_OVERWORLD)
+        general.addEntry(entryBuilder.startIntSlider(new TranslatableText("Nether Fog End Multiplier"), data.netherFogEndMultiplier, MIN_MULTIPLIER, MAX_MULTIPLIER)
+            .setDefaultValue(DEFAULT_NETHER_END_MULTIPLIER)
+            .setTooltip(new TranslatableText("Nether Fog Multiplier"))
+            .setSaveConsumer(newMultiplier -> data.netherFogEndMultiplier = newMultiplier)
+            .build()
+        );
+
+        general.addEntry(entryBuilder.startIntSlider(new TranslatableText("Overworld Fog Start Multiplier"), data.overworldFogStartMultiplier, MIN_MULTIPLIER, MAX_MULTIPLIER)
+            .setDefaultValue(DEFAULT_OVERWORLD_START_MULTIPLIER)
             .setTooltip(new TranslatableText("Overworld Fog Multiplier"))
-            .setSaveConsumer(newMultiplier -> {
-                data.overworldFogMultiplier = newMultiplier;
-            })
+            .setSaveConsumer(newMultiplier -> data.overworldFogStartMultiplier = newMultiplier)
+            .build()
+        );
+
+        general.addEntry(entryBuilder.startIntSlider(new TranslatableText("Overworld Fog End Multiplier"), data.overworldFogEndMultiplier, MIN_MULTIPLIER, MAX_MULTIPLIER)
+            .setDefaultValue(DEFAULT_OVERWORLD_END_MULTIPLIER)
+            .setTooltip(new TranslatableText("Overworld Fog Multiplier"))
+            .setSaveConsumer(newMultiplier -> data.overworldFogEndMultiplier = newMultiplier)
             .build()
         );
         
@@ -112,7 +130,7 @@ public final class FogControlConfig {
             Gson gson = new GsonBuilder().create();
             gson.toJson(data, writer);
         } catch (IOException e) {
-            System.err.printf("[Fog Control Mod] Unable to write Fog Control Mod config to %s\n\tException is: %s\n", CONFIG_PATH.toString(), e.toString());
+            System.err.printf("[Fog Control Mod] Unable to write Fog Control Mod config to %s\n\tException is: %s\n", CONFIG_PATH, e);
         }
     }
 
@@ -123,16 +141,22 @@ public final class FogControlConfig {
 
             // Ensure any null fields are defaulted
             if (data.netherFogMaxDistance == null) {
-                data.netherFogMaxDistance = DEFAULT_DISTANCE_NETHER;
+                data.netherFogMaxDistance = DEFAULT_NETHER_DISTANCE;
             }
-            if (data.netherFogMultiplier == null) {
-                data.netherFogMultiplier = DEFAULT_MULTIPLIER_NETHER;
+            if (data.netherFogStartMultiplier == null) {
+                data.netherFogStartMultiplier = DEFAULT_NETHER_START_MULTIPLIER;
             }
-            if (data.overworldFogMultiplier == null) {
-                data.overworldFogMultiplier = DEFAULT_MULTIPLIER_OVERWORLD;
+            if (data.netherFogEndMultiplier == null) {
+                data.netherFogEndMultiplier = DEFAULT_NETHER_END_MULTIPLIER;
+            }
+            if (data.overworldFogStartMultiplier == null) {
+                data.overworldFogStartMultiplier = DEFAULT_OVERWORLD_START_MULTIPLIER;
+            }
+            if (data.overworldFogEndMultiplier == null) {
+                data.overworldFogEndMultiplier = DEFAULT_OVERWORLD_END_MULTIPLIER;
             }
         } catch (Exception e) {
-            System.err.printf("[Fog Control Mod] Unable to read Fog Control Mod config at %s\n\tException is: %s\n", CONFIG_PATH.toString(), e.toString());
+            System.err.printf("[Fog Control Mod] Unable to read Fog Control Mod config at %s\n\tException is: %s\n", CONFIG_PATH, e);
         }
     }
 }
