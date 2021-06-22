@@ -4,7 +4,7 @@
     "version": "${version}",
 
     "name": "Fog Control Mod",
-    "description": "Allows the user to adjust the (client) distance at which nether fog renders.",
+    "description": "Allows the user to adjust the (client) distance at which fogs render.",
     "authors": [
         "capnkork"
     ],
@@ -27,10 +27,10 @@
     ],
 
     "depends": {
-        "fabricloader": ">=0.7.4",
+        "fabricloader": ">=0.11.3",
         "fabric": "*",
-        "minecraft": ">=1.14.4",
-        "modmenu": ">=1.14.3",
+        "minecraft": "1.17.x",
+        "modmenu": ">=2.0.0-beta7",
         "java": ">=16"
     },
     "suggests": {
