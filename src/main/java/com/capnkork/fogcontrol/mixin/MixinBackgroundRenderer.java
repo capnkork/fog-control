@@ -1,5 +1,6 @@
 package com.capnkork.fogcontrol.mixin;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.*;
 
@@ -56,14 +57,21 @@ public abstract class MixinBackgroundRenderer {
     }
 
     @ModifyVariable(
-        slice = @Slice(
-            from = @At(value = "JUMP", opcode = Opcodes.GOTO, ordinal = 9)
-        ),
-        at = @At("STORE"),
-        ordinal = 2,
+        at = @At(value = "STORE", ordinal = 9),
+        index = 7,
         method = "applyFog"
     )
     private static float applyOverworldFogEndMultiplier(float ab) {
         return ab * FogControlConfig.getInstance().getOverworldFogEndMultiplier();
+    }
+
+    @ModifyArg(
+        at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderSystem;setShaderFogEnd(F)V", ordinal = 1),
+        index = 0,
+        method = "applyFog"
+    )
+    private static float fogEndFix(float f) {
+        // Sodium's renderer has some issues when fog end is less than or equal to fog start, so this prevents that
+        return Math.max(RenderSystem.getShaderFogStart() + 1e-4f, f);
     }
 }
