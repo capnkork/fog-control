@@ -57,23 +57,23 @@ public final class FogControlConfig {
         return INSTANCE;
     }
 
-    public Float getNetherFogMaxDistance() {
+    public float getNetherFogMaxDistance() {
         return (float) data.netherFogMaxDistance;
     }
 
-    public Float getNetherFogStartMultiplier() {
+    public float getNetherFogStartMultiplier() {
         return ((float) data.netherFogStartMultiplier) / MULTIPLIER_DIVIDER;
     }
 
-    public Float getNetherFogEndMultiplier() {
+    public float getNetherFogEndMultiplier() {
         return ((float) data.netherFogEndMultiplier) / MULTIPLIER_DIVIDER;
     }
 
-    public Float getOverworldFogStartMultiplier() {
+    public float getOverworldFogStartMultiplier() {
         return ((float) data.overworldFogStartMultiplier) / MULTIPLIER_DIVIDER;
     }
 
-    public Float getOverworldFogEndMultiplier() {
+    public float getOverworldFogEndMultiplier() {
         return ((float) data.overworldFogEndMultiplier) / MULTIPLIER_DIVIDER;
     }
 
