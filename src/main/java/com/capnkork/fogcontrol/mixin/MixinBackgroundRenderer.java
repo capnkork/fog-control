@@ -75,6 +75,7 @@ public abstract class MixinBackgroundRenderer {
     @ModifyArg(
         at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderSystem;setShaderFogEnd(F)V", ordinal = 1),
         index = 0,
+        remap = false,
         method = "applyFog"
     )
     private static float fogEndFix(float f) {

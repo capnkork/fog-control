@@ -94,8 +94,7 @@ public final class FogControlConfig {
     public Screen buildScreen(Screen parent) {
         ConfigBuilder builder = ConfigBuilder.create()
             .setParentScreen(parent)
-            .setTitle(new TranslatableText("Fog Control Mod"))
-            .setTransparentBackground(true);
+            .setTitle(new TranslatableText("Fog Control Mod"));
 
         builder.setSavingRunnable(this::saveConfig);
 
