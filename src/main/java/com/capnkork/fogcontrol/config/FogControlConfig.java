@@ -21,6 +21,9 @@ import me.shedaniel.clothconfig2.api.ConfigEntryBuilder;
 public final class FogControlConfig {
     private static FogControlConfig INSTANCE = null;
 
+    private static final boolean DEFAULT_NETHER_FOG_ENABLED = true;
+    private static final boolean DEFAULT_OVERWORLD_FOG_ENABLED = true;
+
     private static final int MIN_NETHER_DISTANCE = 0;
     private static final int MAX_NETHER_DISTANCE = 512;
     private static final int DEFAULT_NETHER_DISTANCE = 192;
@@ -34,9 +37,12 @@ public final class FogControlConfig {
     private static final int DEFAULT_OVERWORLD_END_MULTIPLIER = 100;
 
     private static class Data {
+        Boolean netherFogEnabled = DEFAULT_NETHER_FOG_ENABLED;
         Integer netherFogMaxDistance = DEFAULT_NETHER_DISTANCE;
         Integer netherFogStartMultiplier = DEFAULT_NETHER_START_MULTIPLIER;
         Integer netherFogEndMultiplier = DEFAULT_NETHER_END_MULTIPLIER;
+
+        Boolean overworldFogEnabled = DEFAULT_OVERWORLD_FOG_ENABLED;
         Integer overworldFogStartMultiplier = DEFAULT_OVERWORLD_START_MULTIPLIER;
         Integer overworldFogEndMultiplier = DEFAULT_OVERWORLD_END_MULTIPLIER;
     }
@@ -57,6 +63,10 @@ public final class FogControlConfig {
         return INSTANCE;
     }
 
+    public boolean isNetherFogEnabled() {
+        return data.netherFogEnabled;
+    }
+
     public float getNetherFogMaxDistance() {
         return (float) data.netherFogMaxDistance;
     }
@@ -67,6 +77,10 @@ public final class FogControlConfig {
 
     public float getNetherFogEndMultiplier() {
         return ((float) data.netherFogEndMultiplier) / MULTIPLIER_DIVIDER;
+    }
+
+    public boolean isOverworldFogEnabled() {
+        return data.overworldFogEnabled;
     }
 
     public float getOverworldFogStartMultiplier() {
@@ -87,40 +101,47 @@ public final class FogControlConfig {
         ConfigEntryBuilder entryBuilder = builder.entryBuilder();
         ConfigCategory general = builder.getOrCreateCategory(new TranslatableText("Fog Controls"));
 
+        general.addEntry(entryBuilder.startBooleanToggle(new TranslatableText("Nether Fog Enabled"), data.netherFogEnabled)
+            .setDefaultValue(DEFAULT_NETHER_FOG_ENABLED)
+            .setTooltip(new TranslatableText("Nether Fog Enabled"))
+            .setSaveConsumer(enabled -> data.netherFogEnabled = enabled)
+            .build());
+
         general.addEntry(entryBuilder.startIntSlider(new TranslatableText("Nether Fog Max Distance"), data.netherFogMaxDistance, MIN_NETHER_DISTANCE, MAX_NETHER_DISTANCE)
             .setDefaultValue(DEFAULT_NETHER_DISTANCE)
             .setTooltip(new TranslatableText("Nether Fog Max Distance"))
             .setSaveConsumer(newDistance -> data.netherFogMaxDistance = newDistance)
-            .build()
-        );
+            .build());
 
         general.addEntry(entryBuilder.startIntSlider(new TranslatableText("Nether Fog Start Multiplier"), data.netherFogStartMultiplier, MIN_MULTIPLIER, MAX_MULTIPLIER)
             .setDefaultValue(DEFAULT_NETHER_START_MULTIPLIER)
             .setTooltip(new TranslatableText("Nether Fog Multiplier"))
             .setSaveConsumer(newMultiplier -> data.netherFogStartMultiplier = newMultiplier)
-            .build()
-        );
+            .build());
 
         general.addEntry(entryBuilder.startIntSlider(new TranslatableText("Nether Fog End Multiplier"), data.netherFogEndMultiplier, MIN_MULTIPLIER, MAX_MULTIPLIER)
             .setDefaultValue(DEFAULT_NETHER_END_MULTIPLIER)
             .setTooltip(new TranslatableText("Nether Fog Multiplier"))
             .setSaveConsumer(newMultiplier -> data.netherFogEndMultiplier = newMultiplier)
-            .build()
-        );
+            .build());
+
+        general.addEntry(entryBuilder.startBooleanToggle(new TranslatableText("Overworld Fog Enabled"), data.overworldFogEnabled)
+            .setDefaultValue(DEFAULT_OVERWORLD_FOG_ENABLED)
+            .setTooltip(new TranslatableText("Overworld Fog Enabled"))
+            .setSaveConsumer(enabled -> data.overworldFogEnabled = enabled)
+            .build());
 
         general.addEntry(entryBuilder.startIntSlider(new TranslatableText("Overworld Fog Start Multiplier"), data.overworldFogStartMultiplier, MIN_MULTIPLIER, MAX_MULTIPLIER)
             .setDefaultValue(DEFAULT_OVERWORLD_START_MULTIPLIER)
             .setTooltip(new TranslatableText("Overworld Fog Multiplier"))
             .setSaveConsumer(newMultiplier -> data.overworldFogStartMultiplier = newMultiplier)
-            .build()
-        );
+            .build());
 
         general.addEntry(entryBuilder.startIntSlider(new TranslatableText("Overworld Fog End Multiplier"), data.overworldFogEndMultiplier, MIN_MULTIPLIER, MAX_MULTIPLIER)
             .setDefaultValue(DEFAULT_OVERWORLD_END_MULTIPLIER)
             .setTooltip(new TranslatableText("Overworld Fog Multiplier"))
             .setSaveConsumer(newMultiplier -> data.overworldFogEndMultiplier = newMultiplier)
-            .build()
-        );
+            .build());
         
         return builder.build();
     }
@@ -140,6 +161,9 @@ public final class FogControlConfig {
             data = gson.fromJson(reader, Data.class);
 
             // Ensure any null fields are defaulted
+            if (data.netherFogEnabled == null) {
+                data.netherFogEnabled = DEFAULT_NETHER_FOG_ENABLED;
+            }
             if (data.netherFogMaxDistance == null) {
                 data.netherFogMaxDistance = DEFAULT_NETHER_DISTANCE;
             }
@@ -148,6 +172,9 @@ public final class FogControlConfig {
             }
             if (data.netherFogEndMultiplier == null) {
                 data.netherFogEndMultiplier = DEFAULT_NETHER_END_MULTIPLIER;
+            }
+            if (data.overworldFogEnabled == null) {
+                data.overworldFogEnabled = DEFAULT_OVERWORLD_FOG_ENABLED;
             }
             if (data.overworldFogStartMultiplier == null) {
                 data.overworldFogStartMultiplier = DEFAULT_OVERWORLD_START_MULTIPLIER;

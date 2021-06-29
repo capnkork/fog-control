@@ -12,6 +12,9 @@ import com.capnkork.fogcontrol.config.FogControlConfig;
 
 @Mixin(BackgroundRenderer.class)
 public abstract class MixinBackgroundRenderer {
+    private static final float SMALL = 0.5F;
+    private static final float LARGE = 100;
+
     @ModifyConstant(
         slice = @Slice(
             from = @At(value = "JUMP", opcode = Opcodes.IFEQ, ordinal = 7)
@@ -31,7 +34,8 @@ public abstract class MixinBackgroundRenderer {
         method = "applyFog"
     )
     private static float applyNetherFogStartMultiplier(float m) {
-        return FogControlConfig.getInstance().getNetherFogStartMultiplier();
+        FogControlConfig config = FogControlConfig.getInstance();
+        return config.isNetherFogEnabled() ? config.getNetherFogStartMultiplier() : LARGE;
     }
 
     @ModifyConstant(
@@ -42,7 +46,8 @@ public abstract class MixinBackgroundRenderer {
         method = "applyFog"
     )
     private static float applyNetherFogEndMultiplier(float m) {
-        return FogControlConfig.getInstance().getNetherFogEndMultiplier();
+        FogControlConfig config = FogControlConfig.getInstance();
+        return config.isNetherFogEnabled() ? config.getNetherFogEndMultiplier() : LARGE;
     }
 
     @ModifyConstant(
@@ -53,7 +58,8 @@ public abstract class MixinBackgroundRenderer {
         method = "applyFog"
     )
     private static float applyOverworldFogStartMultiplier(float m) {
-        return FogControlConfig.getInstance().getOverworldFogStartMultiplier();
+        FogControlConfig config = FogControlConfig.getInstance();
+        return config.isOverworldFogEnabled() ? config.getOverworldFogStartMultiplier() : LARGE;
     }
 
     @ModifyVariable(
@@ -62,7 +68,8 @@ public abstract class MixinBackgroundRenderer {
         method = "applyFog"
     )
     private static float applyOverworldFogEndMultiplier(float ab) {
-        return ab * FogControlConfig.getInstance().getOverworldFogEndMultiplier();
+        FogControlConfig config = FogControlConfig.getInstance();
+        return ab * (config.isOverworldFogEnabled() ? config.getOverworldFogEndMultiplier() : LARGE);
     }
 
     @ModifyArg(
@@ -72,6 +79,6 @@ public abstract class MixinBackgroundRenderer {
     )
     private static float fogEndFix(float f) {
         // Sodium's renderer has some issues when fog end is less than or equal to fog start, so this prevents that
-        return Math.max(RenderSystem.getShaderFogStart() + 1e-4f, f);
+        return Math.max(RenderSystem.getShaderFogStart() + SMALL, f);
     }
 }

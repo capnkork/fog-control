@@ -14,7 +14,7 @@
     },
 
     "license": "MIT",
-    "icon": "assets/fogcontrol/icon.png",
+    "icon": "assets/fog-control/icon.png",
 
     "environment": "client",
     "entrypoints": {
