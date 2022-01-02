@@ -16,8 +16,7 @@ repositories {
 }
 
 dependencies {
-    implementation "com.google.code.gson:gson:2.8.7"
-    include "com.google.code.gson:gson:2.8.7"
+	// Assume that GSON is already loaded (which is the case with multimc and official launcher)
 
 	// To change the versions see the gradle.properties file
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
