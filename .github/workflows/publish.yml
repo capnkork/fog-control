@@ -11,10 +11,11 @@ jobs:
       matrix:
         # Use these Java versions
         java: [
-            16    # Minimum supported by Minecraft
+            17,    # Current Java LTS & minimum supported by Minecraft
+            21,    # Current Java LTS
         ]
         # build release binaries on Ubuntu
-        os: [ ubuntu-20.04 ]
+        os: [ ubuntu-22.04 ]
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout sources
