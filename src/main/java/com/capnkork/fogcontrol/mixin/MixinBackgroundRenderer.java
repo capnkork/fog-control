@@ -1,85 +1,94 @@
 package com.capnkork.fogcontrol.mixin;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.*;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import org.objectweb.asm.Opcodes;
 
 import net.minecraft.client.render.BackgroundRenderer;
+import net.minecraft.client.render.Camera;
 
 import com.capnkork.fogcontrol.config.FogControlConfig;
 
 @Mixin(BackgroundRenderer.class)
 public abstract class MixinBackgroundRenderer {
-    private static final float SMALL = 0.5F;
     private static final float LARGE = 100;
+    private static float viewDistance;
 
-    @ModifyConstant(
-        slice = @Slice(
-            from = @At(value = "JUMP", opcode = Opcodes.IFEQ, ordinal = 7)
+    @Inject(
+        at = @At(
+            value = "HEAD"
         ),
-        constant = @Constant(floatValue = 192.0F, ordinal = 0),
         method = "applyFog"
     )
-    private static float applyNetherFogMaxDistance(float d) {
-        return FogControlConfig.getInstance().getNetherFogMaxDistance();
+    private static void captureViewDistance(Camera camera, BackgroundRenderer.FogType fogType, float viewDistance,
+                                            boolean thickFog, float tickDelta, CallbackInfo ci)
+    {
+        MixinBackgroundRenderer.viewDistance = viewDistance;
     }
 
-    @ModifyConstant(
-        slice = @Slice(
-            from = @At(value = "JUMP", opcode = Opcodes.IFEQ, ordinal = 7)
+    @Redirect(
+        at = @At(
+            value = "FIELD",
+            target = "Lnet/minecraft/client/render/BackgroundRenderer$FogData;fogStart:F",
+            opcode = Opcodes.PUTFIELD,
+            ordinal = 6
         ),
-        constant = @Constant(floatValue = 0.05F, ordinal = 0),
         method = "applyFog"
     )
-    private static float applyNetherFogStartMultiplier(float m) {
+    private static void applyNetherFogStartMultiplier(BackgroundRenderer.FogData fogData, float fogStart) {
         FogControlConfig config = FogControlConfig.getInstance();
-        return config.isNetherFogEnabled() ? config.getNetherFogStartMultiplier() : LARGE;
+        if (config.isNetherFogEnabled()) {
+            fogData.fogStart = Math.min(viewDistance, config.getNetherFogMaxDistance()) * config.getNetherFogStartMultiplier();
+        } else {
+            fogData.fogStart = LARGE * viewDistance;
+        }
     }
 
-    @ModifyConstant(
-        slice = @Slice(
-            from = @At(value = "JUMP", opcode = Opcodes.IFEQ, ordinal = 7)
+    @Redirect(
+        at = @At(
+            value = "FIELD",
+            target = "Lnet/minecraft/client/render/BackgroundRenderer$FogData;fogEnd:F",
+            opcode = Opcodes.PUTFIELD,
+            ordinal = 9
         ),
-        constant = @Constant(floatValue = 0.5F, ordinal = 0),
         method = "applyFog"
     )
-    private static float applyNetherFogEndMultiplier(float m) {
+    private static void applyNetherFogEndMultiplier(BackgroundRenderer.FogData fogData, float fogEnd) {
         FogControlConfig config = FogControlConfig.getInstance();
-        return config.isNetherFogEnabled() ? config.getNetherFogEndMultiplier() : LARGE;
+        if (config.isNetherFogEnabled()) {
+            fogData.fogEnd = Math.min(viewDistance, config.getNetherFogMaxDistance()) * config.getNetherFogEndMultiplier();
+        } else {
+            fogData.fogEnd = LARGE * viewDistance;
+        }
     }
 
-    @ModifyConstant(
-        slice = @Slice(
-            from = @At(value = "JUMP", opcode = Opcodes.GOTO, ordinal = 9)
+    @Redirect(
+        at = @At(
+            value = "FIELD",
+            target = "Lnet/minecraft/client/render/BackgroundRenderer$FogData;fogStart:F",
+            opcode = Opcodes.PUTFIELD,
+            ordinal = 8
         ),
-        constant = @Constant(floatValue = 0.75F, ordinal = 0),
         method = "applyFog"
     )
-    private static float applyOverworldFogStartMultiplier(float m) {
+    private static void applyOverworldFogStartMultiplier(BackgroundRenderer.FogData fogData, float fogStart) {
         FogControlConfig config = FogControlConfig.getInstance();
-        return config.isOverworldFogEnabled() ? config.getOverworldFogStartMultiplier() : LARGE;
+        fogData.fogStart = (config.isOverworldFogEnabled() ? config.getOverworldFogStartMultiplier() : LARGE) * viewDistance;
     }
 
-    @ModifyVariable(
-        at = @At(value = "STORE", ordinal = 9),
-        index = 7,
+    @Redirect(
+        at = @At(
+            value = "FIELD",
+            target = "Lnet/minecraft/client/render/BackgroundRenderer$FogData;fogEnd:F",
+            opcode = Opcodes.PUTFIELD,
+            ordinal = 11
+        ),
         method = "applyFog"
     )
-    private static float applyOverworldFogEndMultiplier(float ab) {
+    private static void applyOverworldFogEndMultiplier(BackgroundRenderer.FogData fogData, float fogEnd) {
         FogControlConfig config = FogControlConfig.getInstance();
-        return ab * (config.isOverworldFogEnabled() ? config.getOverworldFogEndMultiplier() : LARGE);
-    }
-
-    @ModifyArg(
-        at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderSystem;setShaderFogEnd(F)V", ordinal = 1),
-        index = 0,
-        remap = false,
-        method = "applyFog"
-    )
-    private static float fogEndFix(float f) {
-        // Sodium's renderer has some issues when fog end is less than or equal to fog start, so this prevents that
-        return Math.max(RenderSystem.getShaderFogStart() + SMALL, f);
+        fogData.fogEnd = (config.isOverworldFogEnabled() ? config.getOverworldFogEndMultiplier() : LARGE) * viewDistance;
     }
 }

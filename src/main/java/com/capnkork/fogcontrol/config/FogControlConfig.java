@@ -2,7 +2,8 @@ package com.capnkork.fogcontrol.config;
 
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.text.TranslatableText;
+import net.minecraft.text.MutableText;
+import net.minecraft.text.PlainTextContent;
 
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -33,7 +34,7 @@ public final class FogControlConfig {
     private static final int MULTIPLIER_DIVIDER = 100;
     private static final int DEFAULT_NETHER_START_MULTIPLIER = 5;
     private static final int DEFAULT_NETHER_END_MULTIPLIER = 50;
-    private static final int DEFAULT_OVERWORLD_START_MULTIPLIER = 75;
+    private static final int DEFAULT_OVERWORLD_START_MULTIPLIER = 90;
     private static final int DEFAULT_OVERWORLD_END_MULTIPLIER = 100;
 
     private static class Data {
@@ -94,52 +95,52 @@ public final class FogControlConfig {
     public Screen buildScreen(Screen parent) {
         ConfigBuilder builder = ConfigBuilder.create()
             .setParentScreen(parent)
-            .setTitle(new TranslatableText("Fog Control Mod"));
+            .setTitle(MutableText.of(PlainTextContent.of("Fog Control Mod")));
 
         builder.setSavingRunnable(this::saveConfig);
 
         ConfigEntryBuilder entryBuilder = builder.entryBuilder();
-        ConfigCategory general = builder.getOrCreateCategory(new TranslatableText("Fog Controls"));
+        ConfigCategory general = builder.getOrCreateCategory(MutableText.of(PlainTextContent.of("Fog Controls")));
 
-        general.addEntry(entryBuilder.startBooleanToggle(new TranslatableText("Nether Fog Enabled"), data.netherFogEnabled)
+        general.addEntry(entryBuilder.startBooleanToggle(MutableText.of(PlainTextContent.of("Nether Fog Enabled")), data.netherFogEnabled)
             .setDefaultValue(DEFAULT_NETHER_FOG_ENABLED)
-            .setTooltip(new TranslatableText("Nether Fog Enabled"))
+            .setTooltip(MutableText.of(PlainTextContent.of("Nether Fog Enabled")))
             .setSaveConsumer(enabled -> data.netherFogEnabled = enabled)
             .build());
 
-        general.addEntry(entryBuilder.startIntSlider(new TranslatableText("Nether Fog Max Distance"), data.netherFogMaxDistance, MIN_NETHER_DISTANCE, MAX_NETHER_DISTANCE)
+        general.addEntry(entryBuilder.startIntSlider(MutableText.of(PlainTextContent.of("Nether Fog Max Distance")), data.netherFogMaxDistance, MIN_NETHER_DISTANCE, MAX_NETHER_DISTANCE)
             .setDefaultValue(DEFAULT_NETHER_DISTANCE)
-            .setTooltip(new TranslatableText("Nether Fog Max Distance"))
+            .setTooltip(MutableText.of(PlainTextContent.of("Nether Fog Max Distance")))
             .setSaveConsumer(newDistance -> data.netherFogMaxDistance = newDistance)
             .build());
 
-        general.addEntry(entryBuilder.startIntSlider(new TranslatableText("Nether Fog Start Multiplier"), data.netherFogStartMultiplier, MIN_MULTIPLIER, MAX_MULTIPLIER)
+        general.addEntry(entryBuilder.startIntSlider(MutableText.of(PlainTextContent.of("Nether Fog Start Multiplier")), data.netherFogStartMultiplier, MIN_MULTIPLIER, MAX_MULTIPLIER)
             .setDefaultValue(DEFAULT_NETHER_START_MULTIPLIER)
-            .setTooltip(new TranslatableText("Nether Fog Multiplier"))
+            .setTooltip(MutableText.of(PlainTextContent.of("Nether Fog Multiplier")))
             .setSaveConsumer(newMultiplier -> data.netherFogStartMultiplier = newMultiplier)
             .build());
 
-        general.addEntry(entryBuilder.startIntSlider(new TranslatableText("Nether Fog End Multiplier"), data.netherFogEndMultiplier, MIN_MULTIPLIER, MAX_MULTIPLIER)
+        general.addEntry(entryBuilder.startIntSlider(MutableText.of(PlainTextContent.of("Nether Fog End Multiplier")), data.netherFogEndMultiplier, MIN_MULTIPLIER, MAX_MULTIPLIER)
             .setDefaultValue(DEFAULT_NETHER_END_MULTIPLIER)
-            .setTooltip(new TranslatableText("Nether Fog Multiplier"))
+            .setTooltip(MutableText.of(PlainTextContent.of("Nether Fog Multiplier")))
             .setSaveConsumer(newMultiplier -> data.netherFogEndMultiplier = newMultiplier)
             .build());
 
-        general.addEntry(entryBuilder.startBooleanToggle(new TranslatableText("Overworld Fog Enabled"), data.overworldFogEnabled)
+        general.addEntry(entryBuilder.startBooleanToggle(MutableText.of(PlainTextContent.of("Overworld Fog Enabled")), data.overworldFogEnabled)
             .setDefaultValue(DEFAULT_OVERWORLD_FOG_ENABLED)
-            .setTooltip(new TranslatableText("Overworld Fog Enabled"))
+            .setTooltip(MutableText.of(PlainTextContent.of("Overworld Fog Enabled")))
             .setSaveConsumer(enabled -> data.overworldFogEnabled = enabled)
             .build());
 
-        general.addEntry(entryBuilder.startIntSlider(new TranslatableText("Overworld Fog Start Multiplier"), data.overworldFogStartMultiplier, MIN_MULTIPLIER, MAX_MULTIPLIER)
+        general.addEntry(entryBuilder.startIntSlider(MutableText.of(PlainTextContent.of("Overworld Fog Start Multiplier")), data.overworldFogStartMultiplier, MIN_MULTIPLIER, MAX_MULTIPLIER)
             .setDefaultValue(DEFAULT_OVERWORLD_START_MULTIPLIER)
-            .setTooltip(new TranslatableText("Overworld Fog Multiplier"))
+            .setTooltip(MutableText.of(PlainTextContent.of("Overworld Fog Multiplier")))
             .setSaveConsumer(newMultiplier -> data.overworldFogStartMultiplier = newMultiplier)
             .build());
 
-        general.addEntry(entryBuilder.startIntSlider(new TranslatableText("Overworld Fog End Multiplier"), data.overworldFogEndMultiplier, MIN_MULTIPLIER, MAX_MULTIPLIER)
+        general.addEntry(entryBuilder.startIntSlider(MutableText.of(PlainTextContent.of("Overworld Fog End Multiplier")), data.overworldFogEndMultiplier, MIN_MULTIPLIER, MAX_MULTIPLIER)
             .setDefaultValue(DEFAULT_OVERWORLD_END_MULTIPLIER)
-            .setTooltip(new TranslatableText("Overworld Fog Multiplier"))
+            .setTooltip(MutableText.of(PlainTextContent.of("Overworld Fog Multiplier")))
             .setSaveConsumer(newMultiplier -> data.overworldFogEndMultiplier = newMultiplier)
             .build());
         
